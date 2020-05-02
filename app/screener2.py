@@ -47,33 +47,44 @@ allstock = pd.read_csv(csv_filepath)
 
 profile = input("Are you a retiree, young investor, or an adult?")
 
+update = input("Do you want to update the stock info? It was last updated on date.")
 
-try:
-    counter = 0
-    listofstocks = pd.DataFrame()
-    while counter < 11:
-        symbol = allstock['Ticker Symbol'][counter]
-        request_url = f"https://financialmodelingprep.com/api/v3/quote/{symbol}"
-        response = requests.get(request_url)
-        raw_response_text = (json.loads(response.text))
-        response_text = pd.DataFrame(raw_response_text)
-        listofstocks = listofstocks.append(response_text) 
-        counter = counter + 1
-    listofstocks = listofstocks[['symbol', 'price', 'change', 'eps', 'pe' ]]        
-except Exception:
+if update == "yes":
+    try:
+        counter = 0
+        listofstocks = pd.DataFrame()
+        while counter < 2254:
+            symbol = allstock['Ticker Symbol'][counter]
+            request_url = f"https://financialmodelingprep.com/api/v3/quote/{symbol}"
+            response = requests.get(request_url)
+            raw_response_text = (json.loads(response.text))
+            response_text = pd.DataFrame(raw_response_text)
+            listofstocks = listofstocks.append(response_text) 
+            counter = counter + 1
+        listofstocks = listofstocks[['symbol', 'price', 'change', 'eps', 'pe' ]]
+        listofstocks.to_csv('/Users/kunaalsingh/Desktop/screen-project/data/updated_stocklist.csv')
+    except Exception:
+        pass
+
+if update == "no":
     pass
 
+
+
 if profile == "young":
+    listofstocks = pd.read_csv('/Users/kunaalsingh/Desktop/screen-project/data/updated_stocklist.csv')
     listofstocks2 = listofstocks[(listofstocks['pe'] > 20)]
     listofstocks3 = listofstocks2[['symbol', 'price', 'change', 'eps', 'pe' ]]
     print(listofstocks3)
 
 if profile == "adult":
+    listofstocks = pd.read_csv('/Users/kunaalsingh/Desktop/screen-project/data/updated_stocklist.csv')
     listofstocks2 = listofstocks[(listofstocks['pe']< 20)]
     listofstocks3 = listofstocks2[['symbol', 'price', 'change', 'eps', 'pe' ]]
     print(listofstocks3)
 
 if profile == "retiree":
+    listofstocks = pd.read_csv('/Users/kunaalsingh/Desktop/screen-project/data/updated_stocklist.csv')
     listofstocks2 = listofstocks[(listofstocks['pe']< 12)]
     listofstocks3 = listofstocks2[['symbol', 'price', 'change', 'eps', 'pe' ]]
     print(listofstocks3)
