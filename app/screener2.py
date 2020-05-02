@@ -12,13 +12,15 @@ from sendgrid.helpers.mail import (
     FileType, Disposition, ContentId)
 
 
+#next step: give user choice whether to update stock info then or use the current information as of a certain date.
+
 def send_email():
     load_dotenv()
     date = datetime.date.today()
     SENDGRID_API_KEY = os.environ.get("SENDGRID_API_KEY", "OOPS, please set env var called 'SENDGRID_API_KEY'")
     MY_EMAIL_ADDRESS = os.environ.get("MY_EMAIL_ADDRESS", "OOPS, please set env var called 'MY_EMAIL_ADDRESS'")
     SENDGRID_TEMPLATE_ID = os.environ.get("SENDGRID_TEMPLATE_ID", "OOPS, please set env var called 'SENDGRID_TEMPLATE_ID'")
-    file_path = os.path.join(os.path.dirname(__file__), '..', "data", "screened_stocks.csv")
+    file_path = os.path.join(os.path.dirname(__file__), '..', "data", "final_list.csv")
     with open(file_path, 'rb') as f:
         data = f.read()
         f.close()
@@ -26,7 +28,7 @@ def send_email():
     attachment = Attachment()
     attachment.file_content = FileContent(encoded)
     attachment.file_type = FileType('text/csv')
-    attachment.file_name = FileName('screened_stocks.csv')
+    attachment.file_name = FileName('final_list.csv')
     attachment.disposition = Disposition('attachment')
     template_data = {"human_friendly_timestamp": date.strftime("%B %d, %Y")}
     client = SendGridAPIClient(SENDGRID_API_KEY) 
@@ -61,8 +63,6 @@ try:
 except Exception:
     pass
 
-
-
 if profile == "young":
     listofstocks2 = listofstocks[(listofstocks['pe'] > 20)]
     listofstocks3 = listofstocks2[['symbol', 'price', 'change', 'eps', 'pe' ]]
@@ -83,6 +83,7 @@ spread = input("Do you want to export this output to a spreadsheet sent to your 
 while True:
     if spread == "yes":
         print("Ok, processing now. Thanks!")
+        listofstocks3.to_csv('/Users/kunaalsingh/Desktop/screen-project/data/final_list.csv')
         send_email()
         break
     elif spread == "no":
