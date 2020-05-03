@@ -1,7 +1,9 @@
 import os
 import json
 import requests
+import time
 import datetime
+import stat
 import pandas as pd
 import csv
 import base64
@@ -10,6 +12,7 @@ from sendgrid import SendGridAPIClient
 from sendgrid.helpers.mail import (
     Mail, Attachment, FileContent, FileName,
     FileType, Disposition, ContentId)
+from time import strptime
 
 
 #next step: give user choice whether to update stock info then or use the current information as of a certain date.
@@ -42,32 +45,36 @@ def send_email():
         print("Oops, Sendgrid is down. Our bad.", e)
 
 
-csv_filepath = os.path.join(os.path.dirname(__file__), '..', "data", "stocklist.csv")
+csv_filepath = os.path.join(os.path.dirname(__file__), '..', "data", "updated_stocklist.csv")
 allstock = pd.read_csv(csv_filepath)
 
 profile = input("Are you a retiree, young investor, or an adult?")
 
-update = input("Do you want to update the stock info? It was last updated on date.")
 
-if update == "yes":
-    try:
-        counter = 0
-        listofstocks = pd.DataFrame()
-        while counter < 2254:
-            symbol = allstock['Ticker Symbol'][counter]
-            request_url = f"https://financialmodelingprep.com/api/v3/quote/{symbol}"
-            response = requests.get(request_url)
-            raw_response_text = (json.loads(response.text))
-            response_text = pd.DataFrame(raw_response_text)
-            listofstocks = listofstocks.append(response_text) 
-            counter = counter + 1
-        listofstocks = listofstocks[['symbol', 'price', 'change', 'eps', 'pe' ]]
-        listofstocks.to_csv('/Users/kunaalsingh/Desktop/screen-project/data/updated_stocklist.csv')
-    except Exception:
-        pass
+fileStatsObj = os.stat('/Users/kunaalsingh/Desktop/screen-project/data/updated_stocklist.csv')
+modificationTime = time.ctime(fileStatsObj[stat.ST_MTIME])
+update_time = datetime.datetime.strptime(modificationTime,'%a %b %d %H:%M:%S %Y').strftime('%m/%d/%y')
+update = input("Do you want to update the stock info? It was last updated on" + " " + update_time + "." + " ")
 
-if update == "no":
-    pass
+while True:
+    if update == "yes":
+        try:
+            counter = 0
+            listofstocks = pd.DataFrame()
+            while counter < 2254:
+                symbol = allstock['symbol'][counter]
+                request_url = f"https://financialmodelingprep.com/api/v3/quote/{symbol}"
+                response = requests.get(request_url)
+                raw_response_text = (json.loads(response.text))
+                response_text = pd.DataFrame(raw_response_text)
+                listofstocks = listofstocks.append(response_text) 
+                counter = counter + 1
+            listofstocks.to_csv('/Users/kunaalsingh/Desktop/screen-project/data/updated_stocklist.csv')
+            break
+        except Exception:
+            pass
+    if update == "no":
+        break
 
 
 
