@@ -15,7 +15,7 @@ from sendgrid.helpers.mail import (
 from time import strptime
 
 
-#next step: give user choice whether to update stock info then or use the current information as of a certain date.
+#next step: let user provide additional criteria that they want executed. 
 
 def send_email():
     load_dotenv()
@@ -44,16 +44,18 @@ def send_email():
     except Exception as e:
         print("Oops, Sendgrid is down. Our bad.", e)
 
+def convert_modtime_to_date(path):
+    fileStatsObj = os.stat(path)
+    modificationTime = time.ctime(fileStatsObj[stat.ST_MTIME])
+    return datetime.datetime.strptime(modificationTime,'%a %b %d %H:%M:%S %Y').strftime('%m/%d/%y')
+
 
 csv_filepath = os.path.join(os.path.dirname(__file__), '..', "data", "updated_stocklist.csv")
 allstock = pd.read_csv(csv_filepath)
 
 profile = input("Are you a retiree, young investor, or an adult?")
 
-
-fileStatsObj = os.stat('/Users/kunaalsingh/Desktop/screen-project/data/updated_stocklist.csv')
-modificationTime = time.ctime(fileStatsObj[stat.ST_MTIME])
-update_time = datetime.datetime.strptime(modificationTime,'%a %b %d %H:%M:%S %Y').strftime('%m/%d/%y')
+update_time = convert_modtime_to_date('/Users/kunaalsingh/Desktop/screen-project/data/updated_stocklist.csv')
 update = input("Do you want to update the stock info? It was last updated on" + " " + update_time + "." + " ")
 
 while True:
@@ -75,8 +77,6 @@ while True:
             pass
     if update == "no":
         break
-
-
 
 if profile == "young":
     listofstocks = pd.read_csv('/Users/kunaalsingh/Desktop/screen-project/data/updated_stocklist.csv')
