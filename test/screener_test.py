@@ -1,5 +1,5 @@
 
-from app.screener2 import mkt_cap_format, vol_format, convert_modtime_to_date
+from app.screener import mkt_cap_format, vol_format, convert_modtime_to_date
 import stat
 
 def test_mkt_cap_format():
