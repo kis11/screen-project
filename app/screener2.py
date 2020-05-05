@@ -14,8 +14,11 @@ from sendgrid.helpers.mail import (
     FileType, Disposition, ContentId)
 from time import strptime
 
+def mkt_cap_format(x):
+    return "${:.1f}M".format(x/1000000)
 
-#next step: let user provide additional criteria that they want executed. 
+def vol_format(x):
+    return "{:.1f}M".format(x/1000000)
 
 def send_email():
     load_dotenv()
@@ -49,68 +52,110 @@ def convert_modtime_to_date(path):
     modificationTime = time.ctime(fileStatsObj[stat.ST_MTIME])
     return datetime.datetime.strptime(modificationTime,'%a %b %d %H:%M:%S %Y').strftime('%m/%d/%y')
 
-
-csv_filepath = os.path.join(os.path.dirname(__file__), '..', "data", "updated_stocklist.csv")
-allstock = pd.read_csv(csv_filepath)
-
-profile = input("Are you a retiree, young investor, or an adult?")
-
-update_time = convert_modtime_to_date('/Users/kunaalsingh/Desktop/screen-project/data/updated_stocklist.csv')
-update = input("Do you want to update the stock info? It was last updated on" + " " + update_time + "." + " ")
-
-while True:
-    if update == "yes":
-        try:
-            counter = 0
-            listofstocks = pd.DataFrame()
-            while counter < 2254:
-                symbol = allstock['symbol'][counter]
-                request_url = f"https://financialmodelingprep.com/api/v3/quote/{symbol}"
-                response = requests.get(request_url)
-                raw_response_text = (json.loads(response.text))
-                response_text = pd.DataFrame(raw_response_text)
-                listofstocks = listofstocks.append(response_text) 
-                counter = counter + 1
-            listofstocks.to_csv('/Users/kunaalsingh/Desktop/screen-project/data/updated_stocklist.csv')
+if __name__=="__main__":
+    csv_filepath = os.path.join(os.path.dirname(__file__), '..', "data", "full_list.csv")
+    allstock = pd.read_csv(csv_filepath)
+    
+    profile = input("Are you a retiree, young investor, or an adult? ")
+    
+    while True:
+        wtp = input("What is the maximum you are willing to pay for a share of stock? ")
+        if wtp.isnumeric() == False:
+            print("Invalid number. Try again.")
+            exit
+        else:
             break
-        except Exception:
+        
+    while True:
+        liquidity = input("Do you care about liquidity in the stock (volume >1m)? Reply yes or no. ")
+        if liquidity in ("yes", "Yes", "YES"):
+            liquidity = True
+            break
+        else:
+            liquidity = False
+            break
+        
+    update_time = convert_modtime_to_date('/Users/kunaalsingh/Desktop/screen-project/data/updated_stocklist.pkl')
+    update = input("Do you want to update the stock info? ")
+    #It was last updated on" + " " + update_time + "." + "
+    
+    
+    
+    while True:
+        if update in ("yes", "Yes", "YES"):
+            try:
+                counter = 0
+                listofstocks = pd.DataFrame()
+                while counter < 2352:
+                    symbol = allstock['Ticker Symbol'][counter]
+                    request_url = f"https://financialmodelingprep.com/api/v3/quote/{symbol}"
+                    response = requests.get(request_url)
+                    raw_response_text = (json.loads(response.text))
+                    response_text = pd.DataFrame(raw_response_text)
+                    listofstocks = listofstocks.append(response_text)
+                    counter = counter + 1
+                listofstocks.to_pickle('/Users/kunaalsingh/Desktop/screen-project/data/updated_stocklist.pkl')
+                break
+            except Exception:
+                continue
+            break
+        if update in ("no", "No", "NO"):
+            break
+        
+    if profile in ("young", "young investor"):
+        listofstocks = pd.read_pickle('/Users/kunaalsingh/Desktop/screen-project/data/updated_stocklist.pkl')
+        listofstocks2 = listofstocks[(listofstocks['pe'] > 20)]
+        listofstocks2 = listofstocks2[(listofstocks2['price'])<float(wtp)]
+        if liquidity == True:
+            listofstocks2 = listofstocks2[(listofstocks2['avgVolume'])>1000000]
+        elif liquidity == False:
             pass
-    if update == "no":
-        break
-
-if profile == "young":
-    listofstocks = pd.read_csv('/Users/kunaalsingh/Desktop/screen-project/data/updated_stocklist.csv')
-    listofstocks2 = listofstocks[(listofstocks['pe'] > 20)]
-    listofstocks3 = listofstocks2[['symbol', 'price', 'change', 'eps', 'pe' ]]
-    print(listofstocks3)
-
-if profile == "adult":
-    listofstocks = pd.read_csv('/Users/kunaalsingh/Desktop/screen-project/data/updated_stocklist.csv')
-    listofstocks2 = listofstocks[(listofstocks['pe']< 20)]
-    listofstocks3 = listofstocks2[['symbol', 'price', 'change', 'eps', 'pe' ]]
-    print(listofstocks3)
-
-if profile == "retiree":
-    listofstocks = pd.read_csv('/Users/kunaalsingh/Desktop/screen-project/data/updated_stocklist.csv')
-    listofstocks2 = listofstocks[(listofstocks['pe']< 12)]
-    listofstocks3 = listofstocks2[['symbol', 'price', 'change', 'eps', 'pe' ]]
-    print(listofstocks3)
-
-spread = input("Do you want to export this output to a spreadsheet sent to your email? If you do, enter yes.")
-
-while True:
-    if spread == "yes":
-        print("Ok, processing now. Thanks!")
-        listofstocks3.to_csv('/Users/kunaalsingh/Desktop/screen-project/data/final_list.csv')
-        send_email()
-        break
-    elif spread == "no":
-        print("Ok, sounds good. Thanks for using our service.")
-        break
-    else:
-        print("Sorry, didn't get that, please reply either yes or no.")
-
-
-
-
-
+            
+        listofstocks2.loc[:, 'marketCap'] = listofstocks2.loc[:, 'marketCap'].apply(mkt_cap_format)
+        listofstocks2.loc[:, 'avgVolume'] = listofstocks2.loc[:, 'avgVolume'].apply(vol_format)
+        listofstocks3 = listofstocks2[['symbol', 'price', 'yearHigh', 'yearLow', 'eps', 'pe','marketCap', 'avgVolume']]
+        print(listofstocks3)
+    
+    if profile == "adult":
+        listofstocks = pd.read_pickle('/Users/kunaalsingh/Desktop/screen-project/data/updated_stocklist.pkl')
+        listofstocks2 = listofstocks[(listofstocks['pe']< 20)]
+        listofstocks2 = listofstocks2[(listofstocks2['price'])<float(wtp)]
+        if liquidity == True:
+            listofstocks2 = listofstocks2[(listofstocks2['avgVolume'])>1000000]
+        else:
+            pass
+        listofstocks2.loc[:, 'marketCap'] = listofstocks2.loc[:, 'marketCap'].apply(mkt_cap_format)
+        listofstocks2.loc[:, 'avgVolume'] = listofstocks2.loc[:, 'avgVolume'].apply(vol_format)
+        listofstocks3 = listofstocks2[['symbol', 'price', 'yearHigh', 'yearLow', 'eps', 'pe','marketCap', 'volume']]
+        print(listofstocks3)
+    
+    if profile == "retiree":
+        listofstocks = pd.read_pickle('/Users/kunaalsingh/Desktop/screen-project/data/updated_stocklist.pkl')
+        listofstocks2 = listofstocks[(listofstocks['pe']< 12)]
+        listofstocks2 = listofstocks2[(listofstocks2['price'])<float(wtp)]
+        if liquidity == True:
+            listofstocks2 = listofstocks2[(listofstocks2['avgVolume'])>1000000]
+        else:
+            pass    
+        listofstocks2.loc[:, 'marketCap'] = listofstocks2.loc[:, 'marketCap'].apply(mkt_cap_format)
+        listofstocks2.loc[:, 'avgVolume'] = listofstocks2.loc[:, 'avgVolume'].apply(vol_format)
+        listofstocks3 = listofstocks2[['symbol', 'price', 'yearHigh', 'yearLow', 'eps', 'pe','marketCap', 'avgVolume']]
+        print(listofstocks3)
+    
+    spread = input("Do you want to export this output to a spreadsheet sent to your email? If you do, enter yes.")
+    
+    while True:
+        if spread == "yes":
+            print("Ok, processing now. Thanks!")
+            listofstocks3.to_csv('/Users/kunaalsingh/Desktop/screen-project/data/final_list.csv')
+            send_email()
+            break
+        elif spread == "no":
+            print("Ok, sounds good. Thanks for using our service.")
+            break
+        else:
+            print("Sorry, didn't get that, please reply either yes or no.")
+    
+    
+    
+    
