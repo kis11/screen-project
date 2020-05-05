@@ -52,6 +52,7 @@ def convert_modtime_to_date(path):
     modificationTime = time.ctime(fileStatsObj[stat.ST_MTIME])
     return datetime.datetime.strptime(modificationTime,'%a %b %d %H:%M:%S %Y').strftime('%m/%d/%y')
 
+
 if __name__=="__main__":
     csv_filepath = os.path.join(os.path.dirname(__file__), '..', "data", "full_list.csv")
     allstock = pd.read_csv(csv_filepath)
@@ -106,12 +107,10 @@ if __name__=="__main__":
             listofstocks2 = listofstocks2[(listofstocks2['avgVolume'])>1000000]
         elif liquidity == False:
             pass
-
         listofstocks2.loc[:, 'marketCap'] = listofstocks2.loc[:, 'marketCap'].apply(mkt_cap_format)
         listofstocks2.loc[:, 'avgVolume'] = listofstocks2.loc[:, 'avgVolume'].apply(vol_format)
         listofstocks3 = listofstocks2[['symbol', 'price', 'yearHigh', 'yearLow', 'eps', 'pe','marketCap', 'avgVolume']]
         print(listofstocks3)
-
     if profile == "adult":
         listofstocks = pd.read_pickle('/Users/kunaalsingh/Desktop/screen-project/data/updated_stocklist.pkl')
         listofstocks2 = listofstocks[(listofstocks['pe']< 20)]
@@ -124,7 +123,6 @@ if __name__=="__main__":
         listofstocks2.loc[:, 'avgVolume'] = listofstocks2.loc[:, 'avgVolume'].apply(vol_format)
         listofstocks3 = listofstocks2[['symbol', 'price', 'yearHigh', 'yearLow', 'eps', 'pe','marketCap', 'volume']]
         print(listofstocks3)
-
     if profile == "retiree":
         listofstocks = pd.read_pickle('/Users/kunaalsingh/Desktop/screen-project/data/updated_stocklist.pkl')
         listofstocks2 = listofstocks[(listofstocks['pe']< 12)]
@@ -137,9 +135,7 @@ if __name__=="__main__":
         listofstocks2.loc[:, 'avgVolume'] = listofstocks2.loc[:, 'avgVolume'].apply(vol_format)
         listofstocks3 = listofstocks2[['symbol', 'price', 'yearHigh', 'yearLow', 'eps', 'pe','marketCap', 'avgVolume']]
         print(listofstocks3)
-
     spread = input("Do you want to export this output to a spreadsheet sent to your email? If you do, enter yes.")
-
     while True:
         if spread == "yes":
             print("Ok, processing now. Thanks!")

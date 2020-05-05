@@ -59,3 +59,5 @@ In your virtual environment, navigate to the app folder, and then type "python s
 You will be able to choose the age profile that fits you best. Type either "young investor", "retiree", or "adult". 
 
 You will then be prompted to set a price you are willing to pay. Type what you feel comfortable, but make sure it is a number. 
+
+Then, you will be prompted about whether or not you care about liquidity. If you are concerned that if you want to sell your stock, that there may not be a buyer, please say yes to the question. If not, choose no. 
