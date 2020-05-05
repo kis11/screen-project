@@ -1,6 +1,6 @@
 
-from app.screener2 import mkt_cap_format, vol_format, convert_modtime_to_date 
-
+from app.screener2 import mkt_cap_format, vol_format, convert_modtime_to_date
+import stat
 
 def test_mkt_cap_format():
     result = mkt_cap_format(700000000)
@@ -10,6 +10,6 @@ def test_vol_format():
     result = vol_format(100000000)
     assert result == '100.0M'
 
-
-#def test_convert_modtime_to_date():
-    #print("ok")
+def test_convert_modtime_to_date():
+    result = convert_modtime_to_date('/Users/kunaalsingh/Desktop/singh.pdf')
+    assert result == '08/23/19'

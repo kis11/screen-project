@@ -55,9 +55,9 @@ def convert_modtime_to_date(path):
 if __name__=="__main__":
     csv_filepath = os.path.join(os.path.dirname(__file__), '..', "data", "full_list.csv")
     allstock = pd.read_csv(csv_filepath)
-    
+
     profile = input("Are you a retiree, young investor, or an adult? ")
-    
+
     while True:
         wtp = input("What is the maximum you are willing to pay for a share of stock? ")
         if wtp.isnumeric() == False:
@@ -65,7 +65,7 @@ if __name__=="__main__":
             exit
         else:
             break
-        
+
     while True:
         liquidity = input("Do you care about liquidity in the stock (volume >1m)? Reply yes or no. ")
         if liquidity in ("yes", "Yes", "YES"):
@@ -73,14 +73,10 @@ if __name__=="__main__":
             break
         else:
             liquidity = False
-            break
-        
+            break   
     update_time = convert_modtime_to_date('/Users/kunaalsingh/Desktop/screen-project/data/updated_stocklist.pkl')
-    update = input("Do you want to update the stock info? ")
-    #It was last updated on" + " " + update_time + "." + "
-    
-    
-    
+    update = input("Do you want to update the stock info? It was last updated on" + " " + update_time + "." + " ")
+
     while True:
         if update in ("yes", "Yes", "YES"):
             try:
@@ -101,7 +97,7 @@ if __name__=="__main__":
             break
         if update in ("no", "No", "NO"):
             break
-        
+
     if profile in ("young", "young investor"):
         listofstocks = pd.read_pickle('/Users/kunaalsingh/Desktop/screen-project/data/updated_stocklist.pkl')
         listofstocks2 = listofstocks[(listofstocks['pe'] > 20)]
@@ -110,12 +106,12 @@ if __name__=="__main__":
             listofstocks2 = listofstocks2[(listofstocks2['avgVolume'])>1000000]
         elif liquidity == False:
             pass
-            
+
         listofstocks2.loc[:, 'marketCap'] = listofstocks2.loc[:, 'marketCap'].apply(mkt_cap_format)
         listofstocks2.loc[:, 'avgVolume'] = listofstocks2.loc[:, 'avgVolume'].apply(vol_format)
         listofstocks3 = listofstocks2[['symbol', 'price', 'yearHigh', 'yearLow', 'eps', 'pe','marketCap', 'avgVolume']]
         print(listofstocks3)
-    
+
     if profile == "adult":
         listofstocks = pd.read_pickle('/Users/kunaalsingh/Desktop/screen-project/data/updated_stocklist.pkl')
         listofstocks2 = listofstocks[(listofstocks['pe']< 20)]
@@ -128,7 +124,7 @@ if __name__=="__main__":
         listofstocks2.loc[:, 'avgVolume'] = listofstocks2.loc[:, 'avgVolume'].apply(vol_format)
         listofstocks3 = listofstocks2[['symbol', 'price', 'yearHigh', 'yearLow', 'eps', 'pe','marketCap', 'volume']]
         print(listofstocks3)
-    
+
     if profile == "retiree":
         listofstocks = pd.read_pickle('/Users/kunaalsingh/Desktop/screen-project/data/updated_stocklist.pkl')
         listofstocks2 = listofstocks[(listofstocks['pe']< 12)]
@@ -141,9 +137,9 @@ if __name__=="__main__":
         listofstocks2.loc[:, 'avgVolume'] = listofstocks2.loc[:, 'avgVolume'].apply(vol_format)
         listofstocks3 = listofstocks2[['symbol', 'price', 'yearHigh', 'yearLow', 'eps', 'pe','marketCap', 'avgVolume']]
         print(listofstocks3)
-    
+
     spread = input("Do you want to export this output to a spreadsheet sent to your email? If you do, enter yes.")
-    
+
     while True:
         if spread == "yes":
             print("Ok, processing now. Thanks!")
@@ -155,7 +151,6 @@ if __name__=="__main__":
             break
         else:
             print("Sorry, didn't get that, please reply either yes or no.")
-    
-    
-    
-    
+
+
+
