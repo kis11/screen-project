@@ -75,6 +75,7 @@ if __name__=="__main__":
         else:
             liquidity = False
             break   
+    
     update_time = convert_modtime_to_date('/Users/kunaalsingh/Desktop/screen-project/data/updated_stocklist.pkl')
     update = input("Do you want to update the stock info? It was last updated on" + " " + update_time + "." + " ")
 
