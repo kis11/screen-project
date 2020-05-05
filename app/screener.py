@@ -52,7 +52,6 @@ def convert_modtime_to_date(path):
     modificationTime = time.ctime(fileStatsObj[stat.ST_MTIME])
     return datetime.datetime.strptime(modificationTime,'%a %b %d %H:%M:%S %Y').strftime('%m/%d/%y')
 
-
 if __name__=="__main__":
     csv_filepath = os.path.join(os.path.dirname(__file__), '..', "data", "full_list.csv")
     allstock = pd.read_csv(csv_filepath)
@@ -100,7 +99,7 @@ if __name__=="__main__":
         if update in ("no", "No", "NO"):
             break
 
-    if profile in ("young", "young investor"):
+    if profile in ("young", "young investor", "YOUNG", "YOUNG INVESTOR"):
         listofstocks = pd.read_pickle('/Users/kunaalsingh/Desktop/screen-project/data/updated_stocklist.pkl')
         listofstocks2 = listofstocks[(listofstocks['pe'] > 20)]
         listofstocks2 = listofstocks2[(listofstocks2['price'])<float(wtp)]
@@ -112,7 +111,7 @@ if __name__=="__main__":
         listofstocks2.loc[:, 'avgVolume'] = listofstocks2.loc[:, 'avgVolume'].apply(vol_format)
         listofstocks3 = listofstocks2[['symbol', 'price', 'yearHigh', 'yearLow', 'eps', 'pe','marketCap', 'avgVolume']]
         print(listofstocks3)
-    if profile == "adult":
+    if profile in ("adult", "Adult", "ADULT"):
         listofstocks = pd.read_pickle('/Users/kunaalsingh/Desktop/screen-project/data/updated_stocklist.pkl')
         listofstocks2 = listofstocks[(listofstocks['pe']< 20)]
         listofstocks2 = listofstocks2[(listofstocks2['price'])<float(wtp)]
@@ -124,7 +123,7 @@ if __name__=="__main__":
         listofstocks2.loc[:, 'avgVolume'] = listofstocks2.loc[:, 'avgVolume'].apply(vol_format)
         listofstocks3 = listofstocks2[['symbol', 'price', 'yearHigh', 'yearLow', 'eps', 'pe','marketCap', 'volume']]
         print(listofstocks3)
-    if profile == "retiree":
+    if profile in ("retiree", "RETIREE", "Retiree"):
         listofstocks = pd.read_pickle('/Users/kunaalsingh/Desktop/screen-project/data/updated_stocklist.pkl')
         listofstocks2 = listofstocks[(listofstocks['pe']< 12)]
         listofstocks2 = listofstocks2[(listofstocks2['price'])<float(wtp)]
@@ -136,7 +135,7 @@ if __name__=="__main__":
         listofstocks2.loc[:, 'avgVolume'] = listofstocks2.loc[:, 'avgVolume'].apply(vol_format)
         listofstocks3 = listofstocks2[['symbol', 'price', 'yearHigh', 'yearLow', 'eps', 'pe','marketCap', 'avgVolume']]
         print(listofstocks3)
-    spread = input("Do you want to export this output to a spreadsheet sent to your email? If you do, enter yes.")
+    spread = input("Do you want to export this output to a spreadsheet sent to your email? If you do, enter yes. ")
     while True:
         if spread == "yes":
             print("Ok, processing now. Thanks!")
