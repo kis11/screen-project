@@ -148,8 +148,3 @@ if __name__=="__main__":
         else:
             print("Sorry, didn't get that, please reply either yes or no.")
 
-
-#ok2
-#ok
-#ok3
-#ok4
