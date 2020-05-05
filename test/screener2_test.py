@@ -9,7 +9,3 @@ def test_mkt_cap_format():
 def test_vol_format():
     result = vol_format(100000000)
     assert result == '100.0M'
-
-def test_convert_modtime_to_date():
-    result = convert_modtime_to_date('/Users/kunaalsingh/Desktop/singh.pdf')
-    assert result == '08/23/19'
