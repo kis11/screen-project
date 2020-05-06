@@ -121,6 +121,7 @@ def limit_repeat(dframe, dframe2, d_format, d_format2):
     dframe.loc[:, 'avgVolume'] = dframe.loc[:, 'avgVolume'].apply(d_format2)
     dframe2 = dframe[['symbol', 'price', 'yearHigh', 'yearLow', 'eps', 'pe','marketCap', 'avgVolume']]
     print(dframe2)
+    return dframe2
 
 def company_bio(summary, aframe, specific):
     """
@@ -198,7 +199,7 @@ if __name__=="__main__":
         elif liquidity == False:
             pass
         listofstocks3 = pd.DataFrame({'A' : []})
-        limit_repeat(listofstocks2, listofstocks3, mkt_cap_format,vol_format)
+        listofstocks3 = limit_repeat(listofstocks2, listofstocks3, mkt_cap_format,vol_format)
 
     if profile in ("adult", "Adult", "ADULT"):
         listofstocks = pd.read_pickle('/Users/kunaalsingh/Desktop/screen-project/data/updated_stocklist.pkl')
@@ -209,7 +210,8 @@ if __name__=="__main__":
         else:
             pass
         listofstocks3 = pd.DataFrame({'A' : []})
-        limit_repeat(listofstocks2, listofstocks3, mkt_cap_format,vol_format)
+        listofstocks3 = limit_repeat(listofstocks2, listofstocks3, mkt_cap_format,vol_format)
+        
 
     if profile in ("retiree", "RETIREE", "Retiree"):
         listofstocks = pd.read_pickle('/Users/kunaalsingh/Desktop/screen-project/data/updated_stocklist.pkl')
@@ -220,7 +222,7 @@ if __name__=="__main__":
         else:
             pass
         listofstocks3 = pd.DataFrame({'A' : []})
-        limit_repeat(listofstocks2, listofstocks3, mkt_cap_format,vol_format)    
+        listofstocks3 = limit_repeat(listofstocks2, listofstocks3, mkt_cap_format,vol_format)    
     
     while True:
         spread = input("Do you want to export this output to a spreadsheet sent to your email? If you do, enter yes. ")
@@ -253,5 +255,3 @@ if __name__=="__main__":
         else:
             print('Sorry, try again.')
             exit
-
-#
