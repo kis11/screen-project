@@ -76,6 +76,48 @@ def convert_modtime_to_date(path):
     modificationTime = time.ctime(fileStatsObj[stat.ST_MTIME])
     return datetime.datetime.strptime(modificationTime,'%a %b %d %H:%M:%S %Y').strftime('%m/%d/%y')
 
+def price_filter(frame,other):
+    """
+    Filters stocks by price
+
+    Params:
+        frame = pandas dataframe
+        other = inputted number by user
+    """
+    frame = frame[(frame['price'])<float(other)]
+    return frame
+
+def vol_filter(frame):
+    """
+    Filters stocks by volume
+
+    Params:
+        frame = pandas dataframe
+    """
+    frame = frame[(frame['avgVolume'])>1000000]
+    return frame
+
+def limit_repeat(dframe, dframe2, d_format, d_format2):
+    """
+    Outputs stocks from user criteria
+
+    Params:
+        dframe = original pandas dataframe
+        dframe2 = updated dataframe
+        d_format = first format change
+        d_format2 = second format change
+    """
+    dframe.loc[:, 'marketCap'] = dframe.loc[:, 'marketCap'].apply(d_format)
+    dframe.loc[:, 'avgVolume'] = dframe.loc[:, 'avgVolume'].apply(d_format2)
+    dframe2 = dframe[['symbol', 'price', 'yearHigh', 'yearLow', 'eps', 'pe','marketCap', 'avgVolume']]
+    print(dframe2)
+
+def company_bio(summary, aframe, specific):
+    summary = aframe.loc[aframe['Ticker Symbol'] == specific]
+    summary = summary['Business Description']
+    with pd.option_context('display.max_colwidth', 700):
+        print(summary.to_string())
+
 if __name__=="__main__":
     csv_filepath = os.path.join(os.path.dirname(__file__), '..', "data", "full_list.csv")
     allstock = pd.read_csv(csv_filepath)
@@ -129,43 +171,38 @@ if __name__=="__main__":
         if update in ("no", "No", "NO"):
             break
 
-    
     if profile in ("young", "young investor", "YOUNG", "YOUNG INVESTOR"):
         listofstocks = pd.read_pickle('/Users/kunaalsingh/Desktop/screen-project/data/updated_stocklist.pkl')
         listofstocks2 = listofstocks[(listofstocks['pe'] > 20)]
-        listofstocks2 = listofstocks2[(listofstocks2['price'])<float(wtp)]
+        listofstocks2 = price_filter(listofstocks2,wtp)
         if liquidity == True:
             listofstocks2 = listofstocks2[(listofstocks2['avgVolume'])>1000000]
         elif liquidity == False:
             pass
-        listofstocks2.loc[:, 'marketCap'] = listofstocks2.loc[:, 'marketCap'].apply(mkt_cap_format)
-        listofstocks2.loc[:, 'avgVolume'] = listofstocks2.loc[:, 'avgVolume'].apply(vol_format)
-        listofstocks3 = listofstocks2[['symbol', 'price', 'yearHigh', 'yearLow', 'eps', 'pe','marketCap', 'avgVolume']]
-        print(listofstocks3)
+        listofstocks3 = None
+        limit_repeat(listofstocks2, listofstocks3, mkt_cap_format,vol_format)
+
     if profile in ("adult", "Adult", "ADULT"):
         listofstocks = pd.read_pickle('/Users/kunaalsingh/Desktop/screen-project/data/updated_stocklist.pkl')
         listofstocks2 = listofstocks[(listofstocks['pe']< 20)]
-        listofstocks2 = listofstocks2[(listofstocks2['price'])<float(wtp)]
+        listofstocks2 = price_filter(listofstocks2,wtp)
         if liquidity == True:
             listofstocks2 = listofstocks2[(listofstocks2['avgVolume'])>1000000]
         else:
             pass
-        listofstocks2.loc[:, 'marketCap'] = listofstocks2.loc[:, 'marketCap'].apply(mkt_cap_format)
-        listofstocks2.loc[:, 'avgVolume'] = listofstocks2.loc[:, 'avgVolume'].apply(vol_format)
-        listofstocks3 = listofstocks2[['symbol', 'price', 'yearHigh', 'yearLow', 'eps', 'pe','marketCap', 'volume']]
-        print(listofstocks3)
+        listofstocks3 = None
+        limit_repeat(listofstocks2, listofstocks3, mkt_cap_format,vol_format)
+
     if profile in ("retiree", "RETIREE", "Retiree"):
         listofstocks = pd.read_pickle('/Users/kunaalsingh/Desktop/screen-project/data/updated_stocklist.pkl')
         listofstocks2 = listofstocks[(listofstocks['pe']< 12)]
-        listofstocks2 = listofstocks2[(listofstocks2['price'])<float(wtp)]
+        listofstocks2 = price_filter(listofstocks2,wtp)
         if liquidity == True:
             listofstocks2 = listofstocks2[(listofstocks2['avgVolume'])>1000000]
         else:
-            pass    
-        listofstocks2.loc[:, 'marketCap'] = listofstocks2.loc[:, 'marketCap'].apply(mkt_cap_format)
-        listofstocks2.loc[:, 'avgVolume'] = listofstocks2.loc[:, 'avgVolume'].apply(vol_format)
-        listofstocks3 = listofstocks2[['symbol', 'price', 'yearHigh', 'yearLow', 'eps', 'pe','marketCap', 'avgVolume']]
-        print(listofstocks3)
+            pass
+        listofstocks3 = None
+        limit_repeat(listofstocks2, listofstocks3, mkt_cap_format,vol_format)    
     
     while True:
         spread = input("Do you want to export this output to a spreadsheet sent to your email? If you do, enter yes. ")
@@ -180,17 +217,15 @@ if __name__=="__main__":
             print("Sorry, didn't get that, please reply either yes or no.")
             exit
     
+    
     while True:
         more_info = input("Want to know more about any of the stocks listed? Reply yes or no. ")
         if more_info in ("yes", "Yes", "YES"):
             particular = input("Which ticker do you want to know more about? ")
             biolist = pd.read_csv('/Users/kunaalsingh/Desktop/screen-project/data/full_list.csv')
             if biolist['Ticker Symbol'].str.contains(particular).any():
-                description = biolist.loc[biolist['Ticker Symbol'] == particular]
-                description = description['Business Description']
-                with pd.option_context('display.max_colwidth', 400):
-                    print(description.to_string())
-                break
+                description = None
+                company_bio(description,biolist,particular)
             else:
                 print("Sorry, type a valid ticker.")
                 exit
