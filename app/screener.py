@@ -56,7 +56,13 @@ if __name__=="__main__":
     csv_filepath = os.path.join(os.path.dirname(__file__), '..', "data", "full_list.csv")
     allstock = pd.read_csv(csv_filepath)
 
-    profile = input("Are you a retiree, young investor, or an adult? ")
+    while True:
+        profile = input("Are you a retiree, young investor, or an adult? ")
+        if profile not in ("young", "young investor", "YOUNG", "YOUNG INVESTOR", "adult", "Adult", "ADULT", "retiree", "RETIREE", "Retiree"):
+            print("Try again.")
+            exit
+        else:
+            break
 
     while True:
         wtp = input("What is the maximum you are willing to pay for a share of stock? ")
@@ -99,6 +105,7 @@ if __name__=="__main__":
         if update in ("no", "No", "NO"):
             break
 
+    
     if profile in ("young", "young investor", "YOUNG", "YOUNG INVESTOR"):
         listofstocks = pd.read_pickle('/Users/kunaalsingh/Desktop/screen-project/data/updated_stocklist.pkl')
         listofstocks2 = listofstocks[(listofstocks['pe'] > 20)]
@@ -135,16 +142,37 @@ if __name__=="__main__":
         listofstocks2.loc[:, 'avgVolume'] = listofstocks2.loc[:, 'avgVolume'].apply(vol_format)
         listofstocks3 = listofstocks2[['symbol', 'price', 'yearHigh', 'yearLow', 'eps', 'pe','marketCap', 'avgVolume']]
         print(listofstocks3)
-    spread = input("Do you want to export this output to a spreadsheet sent to your email? If you do, enter yes. ")
+    
     while True:
+        spread = input("Do you want to export this output to a spreadsheet sent to your email? If you do, enter yes. ")
         if spread == "yes":
             print("Ok, processing now. Thanks!")
             listofstocks3.to_csv('/Users/kunaalsingh/Desktop/screen-project/data/final_list.csv')
             send_email()
             break
         elif spread == "no":
-            print("Ok, sounds good. Thanks for using our service.")
             break
         else:
             print("Sorry, didn't get that, please reply either yes or no.")
-
+            exit
+    
+    while True:
+        more_info = input("Want to know more about any of the stocks listed? Reply yes or no. ")
+        if more_info in ("yes", "Yes", "YES"):
+            particular = input("Which ticker do you want to know more about? ")
+            biolist = pd.read_csv('/Users/kunaalsingh/Desktop/screen-project/data/full_list.csv')
+            if biolist['Ticker Symbol'].str.contains(particular).any():
+                description = biolist.loc[biolist['Ticker Symbol'] == particular]
+                description = description['Business Description']
+                with pd.option_context('display.max_colwidth', 400):
+                    print(description.to_string())
+                break
+            else:
+                print("Sorry, type a valid ticker.")
+                exit
+        elif more_info in ("no", "No", "NO"):
+            print("Ok, sounds good. Thanks a lot for using our service.")
+            break
+        else:
+            print('Sorry, try again.')
+            exit
