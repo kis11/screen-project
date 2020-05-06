@@ -66,4 +66,4 @@ You will then have the output shown to you on the screen. It may be too large to
 
 When prompted, if you want it emailed, enter yes. If you don't, answer no. 
 
-Finally, our platform gives you the ability to get more information about the stocks you care about. If you want more background on the companies that were selected for you, reply yes to the "Want to know more" question. Then type in the ticker. 
+Finally, our platform gives you the ability to get more information about the stocks you care about. If you want more background on the companies that were selected for you, reply yes to the "Want to know more" question. Then type in the ticker. You can continue to do this until you say no. 
