@@ -38,7 +38,7 @@ def vol_format(x):
     """
     return "{:.1f}M".format(x/1000000)
 
-def send_email():
+def send_email(acct):
     """
     Sends email that attaches final csv results via sendgrid
 
@@ -48,7 +48,6 @@ def send_email():
     load_dotenv()
     date = datetime.date.today()
     SENDGRID_API_KEY = os.environ.get("SENDGRID_API_KEY", "OOPS, please set env var called 'SENDGRID_API_KEY'")
-    MY_EMAIL_ADDRESS = os.environ.get("MY_EMAIL_ADDRESS", "OOPS, please set env var called 'MY_EMAIL_ADDRESS'")
     SENDGRID_TEMPLATE_ID = os.environ.get("SENDGRID_TEMPLATE_ID", "OOPS, please set env var called 'SENDGRID_TEMPLATE_ID'")
     file_path = os.path.join(os.path.dirname(__file__), '..', "data", "final_list.csv")
     with open(file_path, 'rb') as f:
@@ -62,7 +61,7 @@ def send_email():
     attachment.disposition = Disposition('attachment')
     template_data = {"human_friendly_timestamp": date.strftime("%B %d, %Y")}
     client = SendGridAPIClient(SENDGRID_API_KEY) 
-    message = Mail(from_email=MY_EMAIL_ADDRESS, to_emails=MY_EMAIL_ADDRESS)
+    message = Mail(from_email=acct, to_emails=acct)
     message.template_id = SENDGRID_TEMPLATE_ID 
     message.dynamic_template_data = template_data
     message.attachment = attachment
@@ -140,6 +139,8 @@ def company_bio(summary, aframe, specific):
 if __name__=="__main__":
     csv_filepath = os.path.join(os.path.dirname(__file__), '..', "data", "full_list.csv")
     allstock = pd.read_csv(csv_filepath)
+
+    email_acct = input("What is your email? ")
 
     while True:
         profile = input("Are you a retiree, young investor, or an adult? ")
@@ -229,7 +230,7 @@ if __name__=="__main__":
         if spread == "yes":
             print("Ok, processing now. Thanks!")
             listofstocks3.to_csv('/Users/kunaalsingh/Desktop/screen-project/data/final_list.csv')
-            send_email()
+            send_email(email_acct)
             break
         elif spread == "no":
             break

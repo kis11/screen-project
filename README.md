@@ -46,17 +46,18 @@ Because this screener allows the data to be emailed to you, you also need to cre
 
 ```sh
 SENDGRID_API_KEY =
-MY_EMAIL_ADDRESS =
 SENDGRID_TEMPLATE_ID =
 ```
 
-Set the email address to the intended recipient. The template ID should be "d-b9d8944266ab41f4908dfc84875b8720". The API key was given to you when you made your account. 
+The template ID should be "d-b9d8944266ab41f4908dfc84875b8720". The API key was given to you when you made your account. 
 
 Important: Make sure you also have a .gitignore file, that includes .env.
 
 In your virtual environment, navigate to the app folder, and then type "python screener.py". 
 
-You will be able to choose the age profile that fits you best. Type either "young investor", "retiree", or "adult". 
+First set the email address to the intended recipient.
+
+You will then be able to choose the age profile that fits you best. Type either "young investor", "retiree", or "adult". 
 
 You will then be prompted to set a price you are willing to pay. Type what you feel comfortable, but make sure it is a number. 
 
