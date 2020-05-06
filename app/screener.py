@@ -15,12 +15,36 @@ from sendgrid.helpers.mail import (
 from time import strptime
 
 def mkt_cap_format(x):
+    """
+    Formats number to millions of dollars. 
+
+    Params:
+        x (numeric, like int or float) the number to be formatted
+    Example:
+      mkt_cap_format(3000000) 
+      mkt_cap_format(4490000)
+    """
     return "${:.1f}M".format(x/1000000)
 
 def vol_format(x):
+    """
+    Formats stock volume number to millions of shares. 
+
+    Params:
+        x (numeric, like int or float)): the number to be formatted
+    Example:
+        vol_format(10000000) 
+        vol_format(3390000)
+    """
     return "{:.1f}M".format(x/1000000)
 
 def send_email():
+    """
+    Sends email that attaches final csv results via sendgrid
+
+    Params:
+        none
+    """
     load_dotenv()
     date = datetime.date.today()
     SENDGRID_API_KEY = os.environ.get("SENDGRID_API_KEY", "OOPS, please set env var called 'SENDGRID_API_KEY'")
