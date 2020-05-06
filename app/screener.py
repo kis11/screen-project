@@ -116,6 +116,7 @@ def limit_repeat(dframe, dframe2, d_format, d_format2):
         d_format = first format change
         d_format2 = second format change
     """
+    dframe2 = None
     dframe.loc[:, 'marketCap'] = dframe.loc[:, 'marketCap'].apply(d_format)
     dframe.loc[:, 'avgVolume'] = dframe.loc[:, 'avgVolume'].apply(d_format2)
     dframe2 = dframe[['symbol', 'price', 'yearHigh', 'yearLow', 'eps', 'pe','marketCap', 'avgVolume']]
@@ -196,7 +197,7 @@ if __name__=="__main__":
             listofstocks2 = listofstocks2[(listofstocks2['avgVolume'])>1000000]
         elif liquidity == False:
             pass
-        listofstocks3 = None
+        listofstocks3 = pd.DataFrame({'A' : []})
         limit_repeat(listofstocks2, listofstocks3, mkt_cap_format,vol_format)
 
     if profile in ("adult", "Adult", "ADULT"):
@@ -207,7 +208,7 @@ if __name__=="__main__":
             listofstocks2 = listofstocks2[(listofstocks2['avgVolume'])>1000000]
         else:
             pass
-        listofstocks3 = None
+        listofstocks3 = pd.DataFrame({'A' : []})
         limit_repeat(listofstocks2, listofstocks3, mkt_cap_format,vol_format)
 
     if profile in ("retiree", "RETIREE", "Retiree"):
@@ -218,7 +219,7 @@ if __name__=="__main__":
             listofstocks2 = listofstocks2[(listofstocks2['avgVolume'])>1000000]
         else:
             pass
-        listofstocks3 = None
+        listofstocks3 = pd.DataFrame({'A' : []})
         limit_repeat(listofstocks2, listofstocks3, mkt_cap_format,vol_format)    
     
     while True:
