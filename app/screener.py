@@ -72,6 +72,15 @@ def send_email():
         print("Oops, Sendgrid is down. Our bad.", e)
 
 def convert_modtime_to_date(path):
+    """
+    Formats last modification date of a file into m/d/y form. 
+
+    Params:
+        path (file path): the file to be documented
+    Example:
+        convert_modtime_to_date(/users/.../last_minute_submission.pdf)
+    """
+
     fileStatsObj = os.stat(path)
     modificationTime = time.ctime(fileStatsObj[stat.ST_MTIME])
     return datetime.datetime.strptime(modificationTime,'%a %b %d %H:%M:%S %Y').strftime('%m/%d/%y')
@@ -113,6 +122,14 @@ def limit_repeat(dframe, dframe2, d_format, d_format2):
     print(dframe2)
 
 def company_bio(summary, aframe, specific):
+    """
+    Outputs desired company's bio and core operations. 
+
+    Params:
+        summary - targeted stock row in database
+        aframe - dataframe
+        specific - targeted stock ticker
+    """
     summary = aframe.loc[aframe['Ticker Symbol'] == specific]
     summary = summary['Business Description']
     with pd.option_context('display.max_colwidth', 700):
@@ -235,3 +252,5 @@ if __name__=="__main__":
         else:
             print('Sorry, try again.')
             exit
+
+#
